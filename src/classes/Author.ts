@@ -5,8 +5,8 @@
  * Copyright: 2020 Nix² Technologies
  * Author: Max Koon (maxk@nix2.io)
  */
-import { AuthorType } from '../types';
-import { AlertRule } from '../parsers/alert/classes';
+import { AuthorType } from '..';
+import { AlertRule } from '..';
 
 const flagInheritence = {
     dev: 'contributer',

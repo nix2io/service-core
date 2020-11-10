@@ -8,3 +8,4 @@
 export * from './classes';
 export * from './types';
 export * from './parsers';
+export * from './errors';
