@@ -1,7 +1,10 @@
 /*
  * File: index.ts
- * Created:
+ * Created: 11/10/2020 12:11:00
  * ----
  * Copyright: 2020 Nix² Technologies
- * Author: name (name@nix2.io)
+ * Author: Max Koon (maxk@nix2.io)
  */
+export * from './classes';
+export * from './types';
+export * from './parsers';
