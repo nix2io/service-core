@@ -27,4 +27,8 @@ describe('Core', () => {
                 -1,
         );
     });
+    step('Get the typescript service', () => {
+        const tsService = core.getServiceClassFromType('typescript');
+        strict.ok(!!tsService);
+    });
 });

@@ -18,6 +18,7 @@ import {
     MakeObjectType,
     User,
     ExecutionContext,
+    ImplementationError,
 } from '..';
 import { EDITOR_TYPES, GIT_IGNORE_SERVICE_BASE_URL } from '../constants';
 
@@ -92,6 +93,20 @@ export default abstract class Service {
             });
         }
         return serviceObject;
+    }
+
+    /**
+     * Deserialize an object into an `Service` instance.
+     * @function deserialize
+     * @static
+     * @abstract
+     * @memberof Service
+     * @param   {string} _  Use: `executionContext`: Path to the service.yaml.
+     * @param   {object} __ Use: `data`: Javascript object of the `Info`.
+     * @returns {Service}   Service context object.
+     */
+    static deserialize(_: ExecutionContext, __: ServiceType): Service {
+        throw new ImplementationError('deserialize');
     }
 
     /**
