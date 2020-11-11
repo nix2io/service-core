@@ -113,9 +113,9 @@ export default class ServiceCore {
     /**
      * Return the service object in the users current directory.
      * @param   {ExecutionContext} executionContext Execution context.
-     * @returns {ServiceContext}                    Instance of the Service Context.
+     * @returns {ServiceContext}                    New `Service` instance.
      */
-    getServiceContext(executionContext: ExecutionContext): Service | null {
+    getService(executionContext: ExecutionContext): Service | null {
         if (!existsSync(executionContext.serviceFilePath)) return null;
         const content = readFileSync(executionContext.serviceFilePath, 'utf8');
         const data = safeLoad(content);
