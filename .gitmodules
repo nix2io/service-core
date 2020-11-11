@@ -1,0 +1,3 @@
+[submodule "tests/plugins/typescript"]
+	path = tests/plugins/typescript
+	url = https://github.com/nix2io/service-plugin-typescript
