@@ -6,5 +6,7 @@ export { default as Field } from './Field';
 export { default as Service } from './Service';
 export { default as User } from './User';
 export { default as ExecutionContext } from './ExecutionContext';
+export { default as ServiceCore } from './ServiceCore';
+export { default as ServicePlugin } from './ServicePlugin';
 // Managers
 export { default as VersionManager } from './VersionManager';

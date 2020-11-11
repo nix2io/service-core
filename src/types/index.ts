@@ -16,4 +16,5 @@ export { default as SchemaType } from './SchemaType';
 export { default as PackageJSONType } from './PackageJSONType';
 export { default as MakeObjectType } from './MakeObjectType';
 export { default as ServiceType } from './ServiceType';
+export { default as ConfigType } from './ConfigType';
 export { Any, Obj, Primative } from './ObjectType';
