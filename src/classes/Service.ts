@@ -5,22 +5,24 @@
  * Copyright: 2020 Nix² Technologies
  * Author: Max Koon (maxk@nix2.io)
  */
-import fs = require('fs');
-import { dirname, join } from 'path';
 
-import Axios from 'axios';
 import * as yaml from 'js-yaml';
 
+import { EDITOR_TYPES, GIT_IGNORE_SERVICE_BASE_URL } from '../constants';
 import {
-    Info,
-    Schema,
-    ServiceType,
-    MakeObjectType,
-    User,
+    EnvironmentManager,
     ExecutionContext,
     ImplementationError,
+    Info,
+    MakeObjectType,
+    Schema,
+    ServiceType,
+    User,
 } from '..';
-import { EDITOR_TYPES, GIT_IGNORE_SERVICE_BASE_URL } from '../constants';
+import { dirname, join } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+
+import Axios from 'axios';
 
 /**
  * Abstract class to represent a service.
@@ -31,6 +33,7 @@ export default abstract class Service {
     static NAME: string;
     static DIRNAME: string = __dirname;
     public selectedEnvironmentName: string;
+    public environmentManager: EnvironmentManager;
 
     /**
      * Constructor for the `Service`.
@@ -46,6 +49,7 @@ export default abstract class Service {
         public schemas: Schema[],
     ) {
         this.info.service = this;
+        this.environmentManager = new EnvironmentManager(this);
     }
 
     /**
@@ -130,7 +134,7 @@ export default abstract class Service {
      * @returns  {boolean} `true` if successfull.
      */
     write(): boolean {
-        fs.writeFileSync(
+        writeFileSync(
             this.context.serviceFilePath,
             yaml.safeDump(this.serialize()),
         );
@@ -195,7 +199,7 @@ export default abstract class Service {
             `services/${scope}/templates/`,
             `${fileName}.template`,
         );
-        return fs.readFileSync(templatePath, 'utf-8');
+        return readFileSync(templatePath, 'utf-8');
     }
 
     /**
@@ -219,10 +223,7 @@ export default abstract class Service {
      */
     createREADME(): void {
         const READMEContent = this.makeREADMELines().join('\n');
-        fs.writeFileSync(
-            join(this.serviceDirectory, 'README.md'),
-            READMEContent,
-        );
+        writeFileSync(join(this.serviceDirectory, 'README.md'), READMEContent);
     }
 
     /**
@@ -272,7 +273,7 @@ export default abstract class Service {
         await Axios.get(url)
             .then((response) => {
                 const ignoreContent = response.data;
-                fs.writeFileSync(
+                writeFileSync(
                     join(this.serviceDirectory, '.gitignore'),
                     ignoreContent,
                 );

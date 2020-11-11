@@ -1,6 +1,6 @@
 {
     "name": "@nix2/service-core",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Core functionality to manage the service.yaml programmatically.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -35,6 +35,9 @@
     ],
     "dependencies": {
         "axios": "^0.21.0",
+        "dotenv": "^8.2.0",
+        "eol": "^0.9.1",
+        "escape-string-regexp": "^4.0.0",
         "js-yaml": "^3.14.0",
         "semver": "^7.3.2"
     }

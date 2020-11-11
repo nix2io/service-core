@@ -3,12 +3,11 @@
  * ----
  * Copyright: 2020 Nix² Technologies
  */
-import { describe } from 'mocha';
-import { strict } from 'assert';
-import { step } from 'mocha-steps';
-
 import { ServiceCore } from '../src';
 import { WORKING_CONFIG } from './const_config';
+import { describe } from 'mocha';
+import { step } from 'mocha-steps';
+import { strict } from 'assert';
 
 describe('Core', () => {
     let core: ServiceCore;

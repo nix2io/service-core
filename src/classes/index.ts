@@ -10,3 +10,4 @@ export { default as ServiceCore } from './ServiceCore';
 export { default as ServicePlugin } from './ServicePlugin';
 // Managers
 export { default as VersionManager } from './VersionManager';
+export { default as EnvironmentManager } from './EnvironmentManager';
