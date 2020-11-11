@@ -15,5 +15,5 @@ export { default as PathType } from './PathType';
 export { default as SchemaType } from './SchemaType';
 export { default as PackageJSONType } from './PackageJSONType';
 export { default as MakeObjectType } from './MakeObjectType';
-export { default as ServiceContextType } from './ServiceContextType';
+export { default as ServiceType } from './ServiceType';
 export { Any, Obj, Primative } from './ObjectType';

@@ -82,7 +82,7 @@ export default class VersionManager {
     set(version: string): string {
         if (!semver.valid(version)) throw new InvalidVersionError(version);
         this.info.version = version;
-        this.info.serviceContext?.postVersionManager();
+        this.info.service?.postVersionBump();
         return version;
     }
 }
