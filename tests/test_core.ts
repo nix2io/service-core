@@ -21,4 +21,10 @@ describe('Core', () => {
             WORKING_CONFIG.pluginsDirectory,
         );
     });
+    step('Check for typescript plugin', () => {
+        strict.ok(
+            core.plugins.map((plugin) => plugin.NAME).indexOf('typescript') !=
+                -1,
+        );
+    });
 });
