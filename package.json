@@ -1,6 +1,6 @@
 {
     "name": "@nix2/service-core",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Core functionality to manage the service.yaml programmatically.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
