@@ -15,7 +15,10 @@ describe('Core', () => {
     step('Create a core', () => {
         core = new ServiceCore(WORKING_CONFIG);
     });
-    step('Check plugin names', () => {
-        strict.strictEqual(core.config.plugins, WORKING_CONFIG.plugins);
+    step('Check plugin directory', () => {
+        strict.strictEqual(
+            core.config.pluginsDirectory,
+            WORKING_CONFIG.pluginsDirectory,
+        );
     });
 });

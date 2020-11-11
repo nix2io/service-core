@@ -7,14 +7,17 @@
  */
 
 // import { existsSync, readFileSync } from 'fs';
-import { Service, ConfigType, ServicePlugin, PluginNotFoundError } from '..';
+import { lstatSync, readdirSync } from 'fs';
+import { basename, join } from 'path';
+import { Service, ConfigType, ServicePlugin } from '..';
+import { InvalidPluginError } from '../errors';
 
 /**
  * Class for represent a service core.
  * @class ServiceCore
  */
 export default class ServiceCore {
-    private plugins: ServicePlugin[];
+    public plugins: ServicePlugin[];
 
     /**
      * Constructor for the service core.
@@ -33,20 +36,24 @@ export default class ServiceCore {
      * @returns {void}
      */
     private refreshPlugins(): void {
-        if (!this.config.plugins) return;
-        for (const pluginName of this.config.plugins) {
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                const pkg = require(pluginName);
-
-                console.log(pkg);
-            } catch (err) {
-                if (err.message.includes('Cannot find module')) {
-                    throw new PluginNotFoundError(pluginName);
+        if (this.config.pluginsDirectory == undefined) return;
+        readdirSync(this.config.pluginsDirectory).forEach(
+            (file: string, _: unknown) => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const directoryPath = join(this.config.pluginsDirectory!, file);
+                if (lstatSync(directoryPath).isDirectory()) {
+                    const pkg = require.main?.require(
+                        join(directoryPath, '/src/'),
+                    );
+                    if (typeof pkg.getPlugin != 'function')
+                        throw new InvalidPluginError(basename(directoryPath));
+                    const plugin = pkg.getplugin();
+                    if (!(plugin instanceof ServicePlugin))
+                        throw new InvalidPluginError(basename(directoryPath));
+                    this.plugins.push(plugin);
                 }
-                throw err;
-            }
-        }
+            },
+        );
     }
 
     /**

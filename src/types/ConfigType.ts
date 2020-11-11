@@ -7,5 +7,5 @@
  */
 
 export default interface ConfigType {
-    plugins?: string[];
+    pluginsDirectory?: string;
 }

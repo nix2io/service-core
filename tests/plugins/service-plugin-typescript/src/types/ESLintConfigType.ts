@@ -1,4 +1,4 @@
-import { Obj } from './ObjectType';
+import { Obj } from '@nix2/service-core';
 
 enum Rules {
     off = 0,
