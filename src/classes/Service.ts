@@ -14,7 +14,7 @@ import {
     ExecutionContext,
     ImplementationError,
     Info,
-    MakeObjectType,
+    InitializeServiceDataType,
     Schema,
     ServiceType,
     User,
@@ -23,6 +23,7 @@ import { dirname, join } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 
 import Axios from 'axios';
+import { titleCase } from '../util';
 
 /**
  * Abstract class to represent a service.
@@ -63,13 +64,36 @@ export default abstract class Service {
     }
 
     /**
+     * Return the inital data for the base Service Context.
+     * @param   {string} identifier         Service identifier.
+     * @param   {User}   user               User using the service.
+     * @returns {InitializeServiceDataType} Initialize data.
+     */
+    static makeInitialData(
+        identifier: string,
+        user: User | null,
+    ): InitializeServiceDataType {
+        const label = titleCase(identifier.replace(/-/g, ' ')),
+            description = 'A Nix² Service';
+        return {
+            identifier,
+            label,
+            description,
+            userLeadDev: user != null,
+        };
+    }
+
+    /**
      * Make a `Service` object.
      * @static
-     * @param {MakeObjectType} data Data for the `Service` object.
-     * @param {User}           user User instance.
-     * @returns {ServiceType} New `Service` object.
+     * @param {InitializeServiceDataType} data Data for the `Service` object.
+     * @param {User}                      user User instance.
+     * @returns {ServiceType}                  New `Service` object.
      */
-    static makeObject(data: MakeObjectType, user: User | null): ServiceType {
+    static makeObject(
+        data: InitializeServiceDataType,
+        user: User | null,
+    ): ServiceType {
         const currentTimestamp = Math.floor(new Date().getTime() / 1000);
         const serviceObject: ServiceType = {
             info: {

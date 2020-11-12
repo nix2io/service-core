@@ -58,7 +58,6 @@ export default class ServiceCore {
                     if (typeof pkg.getPlugin != 'function')
                         throw new InvalidPluginError(basename(directoryPath));
                     const plugin = pkg.getPlugin();
-                    // TODO: add some sort of type check
                     this.plugins.push(plugin);
                 }
             },
