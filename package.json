@@ -1,11 +1,11 @@
 {
     "name": "@nix2/service-core",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Core functionality to manage the service.yaml programmatically.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "repository": "https://github.com/nix2io/service-core.git",
-    "author": "Name <name@nix2.io>",
+    "author": "Max Koon <maxk@nix2.io>",
     "license": "CC-BY-1.0",
     "private": false,
     "scripts": {
