@@ -1,10 +1,4 @@
-import { Service } from '..';
-
-interface MakeFile {
-    name: string;
-    file: string;
-    method: () => void;
-}
+import { Service, MakeFileType } from '..';
 
 /**
  * Class to represent a plugin.
@@ -30,9 +24,9 @@ export default abstract class ServicePlugin {
      * @function getMakeFiles
      * @memberof ServicePlugin
      * @static
-     * @returns {MakeFile[]} List of make files.
+     * @returns {MakeFileType[]} List of make files.
      */
-    static getMakeFiles(): MakeFile[] {
+    static getMakeFiles(): MakeFileType[] {
         return [
             {
                 name: 'readme',
