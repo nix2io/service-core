@@ -6,7 +6,7 @@
  * Author: Max Koon (maxk@nix2.io)
  */
 
-import { Author, InfoType, VersionManager, ServiceContext } from '..';
+import { Author, InfoType, VersionManager, Service } from '..';
 
 /**
  * Class to represent info for a service.
@@ -14,7 +14,7 @@ import { Author, InfoType, VersionManager, ServiceContext } from '..';
  */
 export default class Info {
     public versionManager: VersionManager;
-    public serviceContext: ServiceContext | null = null;
+    public service: Service | null = null;
     /**
      * Constructor for Info.
      * @param {string}        identifier        Service identifier *see spec for format*.

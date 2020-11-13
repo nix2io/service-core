@@ -1,129 +1,101 @@
 /*
- * File: ServiceContext.ts
+ * File: Service.ts
  * Created: 10/11/2020 13:03:39
  * ----
  * Copyright: 2020 Nix² Technologies
  * Author: Max Koon (maxk@nix2.io)
  */
-import { Info, Schema, Obj, ServiceContextType, MakeObjectType } from '..';
-import { titleCase } from '../util';
-import Axios from 'axios';
 
-import yaml = require('js-yaml');
-import fs = require('fs');
-import { dirname, join } from 'path';
-import path = require('path');
-import inquirer = require('inquirer');
-import { user } from '../user';
-import { readCurrentEnvironmentName } from '../environments';
-import { Environment, User } from '.';
+import * as yaml from 'js-yaml';
+
 import { EDITOR_TYPES, GIT_IGNORE_SERVICE_BASE_URL } from '../constants';
+import {
+    EnvironmentManager,
+    ExecutionContext,
+    ImplementationError,
+    Info,
+    InitializeServiceDataType,
+    Schema,
+    ServiceType,
+    User,
+} from '..';
+import { dirname, join } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+
+import Axios from 'axios';
+import { titleCase } from '../util';
 
 /**
- * Abstract class to represent a service context.
- * @class ServiceContext
+ * Abstract class to represent a service.
+ * @class Service
  * @abstract
  */
-export default abstract class ServiceContext {
+export default abstract class Service {
     static NAME: string;
     static DIRNAME: string = __dirname;
     public selectedEnvironmentName: string;
-    public environment: Environment;
+    public environmentManager: EnvironmentManager;
 
     /**
-     * Constructor for the `ServiceContext`.
-     * @param {string}        serviceFilePath Path to the service.yaml.
-     * @param {Info}          info            Info of the service.
-     * @param {string}        type            Type of service.
-     * @param {Array<Schema>} schemas         List of service schemas.
+     * Constructor for the `Service`.
+     * @param {ExecutionContext} context Context of the code execution.
+     * @param {Info}             info    Info of the service.
+     * @param {string}           type    Type of service.
+     * @param {Array<Schema>}    schemas List of service schemas.
      */
     constructor(
-        private serviceFilePath: string,
+        protected context: ExecutionContext,
         public info: Info,
         public type: string,
         public schemas: Schema[],
     ) {
-        this.selectedEnvironmentName = readCurrentEnvironmentName();
-        this.environment = new Environment(this);
-        this.info.serviceContext = this;
+        this.info.service = this;
+        this.environmentManager = new EnvironmentManager(this);
     }
 
     /**
      * Returns the service directory.
-     * @memberof ServiceContext
+     * @memberof Service
      * @protected
      * @returns {string} Path to the directory.
      */
     get serviceDirectory(): string {
-        return dirname(this.serviceFilePath);
+        return dirname(this.context.serviceFilePath);
     }
 
     /**
      * Return the inital data for the base Service Context.
-     * @param {Obj}  options Options given by the CLI.
-     * @param {User} user    User object.
-     * @returns {QuestionType} Object of questions for inquierer.js.
+     * @param   {string} identifier         Service identifier.
+     * @param   {User}   user               User using the service.
+     * @returns {InitializeServiceDataType} Initialize data.
      */
-    static getInitializeData(options: Obj, user: User | null): QuestionType {
-        const authed = user != null,
-            serviceIdentifier = path.basename(getServiceContextPath(options)),
-            serviceLabel = titleCase(serviceIdentifier.replace(/-/g, ' ')),
-            serviceDescription = 'A Nix² Service';
-        const data: QuestionType = {
-            identifier: {
-                value: serviceIdentifier,
-                prompt: {
-                    type: 'input',
-                    message: 'Identifier',
-                    name: 'identifier',
-                    default: serviceIdentifier,
-                },
-            },
-            label: {
-                value: serviceLabel,
-                prompt: {
-                    type: 'input',
-                    message: 'Label',
-                    name: 'label',
-                    default: serviceLabel,
-                },
-            },
-            description: {
-                value: serviceDescription,
-                prompt: {
-                    type: 'input',
-                    message: 'Description',
-                    name: 'description',
-                    default: serviceDescription,
-                },
-            },
+    static makeInitialData(
+        identifier: string,
+        user: User | null,
+    ): InitializeServiceDataType {
+        const label = titleCase(identifier.replace(/-/g, ' ')),
+            description = 'A Nix² Service';
+        return {
+            identifier,
+            label,
+            description,
+            userLeadDev: user != null,
         };
-        if (authed) {
-            data.makeLeadDev = {
-                value: true,
-                prompt: {
-                    type: 'confirm',
-                    message: 'Make you the lead dev?',
-                    name: 'userLeadDev',
-                },
-            };
-        }
-        return data;
     }
 
     /**
-     * Make a `ServiceContext` object.
+     * Make a `Service` object.
      * @static
-     * @param {MakeObjectType} data Data for the `ServiceContext` object.
-     * @param {User}           user User instance.
-     * @returns {ServiceContextType} New `ServiceContext` object.
+     * @param {InitializeServiceDataType} data Data for the `Service` object.
+     * @param {User}                      user User instance.
+     * @returns {ServiceType}                  New `Service` object.
      */
     static makeObject(
-        data: MakeObjectType,
+        data: InitializeServiceDataType,
         user: User | null,
-    ): ServiceContextType {
+    ): ServiceType {
         const currentTimestamp = Math.floor(new Date().getTime() / 1000);
-        const serviceObject: ServiceContextType = {
+        const serviceObject: ServiceType = {
             info: {
                 identifier: data.identifier,
                 label: data.label,
@@ -152,12 +124,26 @@ export default abstract class ServiceContext {
     }
 
     /**
-     * Serialize a ServiceContext instance into an object.
-     * @function serialize
-     * @memberof ServiceContext
-     * @returns  {ServiceContextType} Javascript object.
+     * Deserialize an object into an `Service` instance.
+     * @function deserialize
+     * @static
+     * @abstract
+     * @memberof Service
+     * @param   {string} _  Use: `executionContext`: Path to the service.yaml.
+     * @param   {object} __ Use: `data`: Javascript object of the `Info`.
+     * @returns {Service}   Service context object.
      */
-    serialize(): ServiceContextType {
+    static deserialize(_: ExecutionContext, __: ServiceType): Service {
+        throw new ImplementationError('deserialize');
+    }
+
+    /**
+     * Serialize a Service instance into an object.
+     * @function serialize
+     * @memberof Service
+     * @returns  {ServiceType} Javascript object.
+     */
+    serialize(): ServiceType {
         return {
             info: this.info.serialize(),
             type: this.type,
@@ -166,20 +152,23 @@ export default abstract class ServiceContext {
     }
 
     /**
-     * Writes the current ServiceContext from memory to disk.
+     * Writes the current Service from memory to disk.
      * @function write
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns  {boolean} `true` if successfull.
      */
     write(): boolean {
-        fs.writeFileSync(this.serviceFilePath, yaml.safeDump(this.serialize()));
+        writeFileSync(
+            this.context.serviceFilePath,
+            yaml.safeDump(this.serialize()),
+        );
         return true;
     }
 
     /**
      * Get a schema based on the `identifier`.
      * @function getSchema
-     * @memberof ServiceContext
+     * @memberof Service
      * @param   {string} identifier Identifier of the `Schema` to get.
      * @returns {Schema}            `Schema` to return.
      */
@@ -192,7 +181,7 @@ export default abstract class ServiceContext {
     /**
      * Adds a `Schema` based off a `Schema` object.
      * @function addSchema
-     * @memberof ServiceContext
+     * @memberof Service
      * @param   {Schema} schema `Schema` to add.
      * @returns {Schema}        The given `Schema`.
      */
@@ -206,7 +195,7 @@ export default abstract class ServiceContext {
     /**
      * Removes a `Schema` from it's `identifier`.
      * @function removeSchema
-     * @memberof ServiceContext
+     * @memberof Service
      * @param    {string} identifier `identifier` of the `Schema` to remove.
      * @returns  {boolean}           `true` if the `Schema` was removed.
      */
@@ -220,11 +209,11 @@ export default abstract class ServiceContext {
     /**
      * Read the contents of the template file.
      * @function readTemplate
-     * @memberof ServiceContext
+     * @memberof Service
      * @example
      * // Returns the file content for main.py
-     * serviceContext.getTemplate('ServiceContextType', 'main.py') // app.run('0.0.0.0', port=80)
-     * @param   {string} scope    Scope of the service context.
+     * serviceContext.getTemplate('ServiceType', 'main.py') // app.run('0.0.0.0', port=80)
+     * @param   {string} scope    Scope of the service.
      * @param   {string} fileName Template name.
      * @returns {string}          Template contents.
      */
@@ -234,13 +223,13 @@ export default abstract class ServiceContext {
             `services/${scope}/templates/`,
             `${fileName}.template`,
         );
-        return fs.readFileSync(templatePath, 'utf-8');
+        return readFileSync(templatePath, 'utf-8');
     }
 
     /**
      * Make the lines for the README file.
      * @function getREADMELines
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {string[]} Array of lines for the README.
      */
     makeREADMELines(): string[] {
@@ -253,21 +242,18 @@ export default abstract class ServiceContext {
     /**
      * Create the README.md file.
      * @function createREADME
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {void}
      */
     createREADME(): void {
         const READMEContent = this.makeREADMELines().join('\n');
-        fs.writeFileSync(
-            join(this.serviceDirectory, 'README.md'),
-            READMEContent,
-        );
+        writeFileSync(join(this.serviceDirectory, 'README.md'), READMEContent);
     }
 
     /**
      * Makes the lines for file headers.
      * @function getFileHeaderLines
-     * @memberof ServiceContext
+     * @memberof Service
      * @example
      * // Example: returns file header for main.py
      * serviceContext.getFileHeaderLines('main.py') // ['File: main.py', ...]
@@ -281,8 +267,10 @@ export default abstract class ServiceContext {
             '----',
             'Copyright: 2020 Nix² Technologies',
         ];
-        if (user != null) {
-            lines.push(`Author: ${user.name} (${user.email})`);
+        if (this.context.user != null) {
+            lines.push(
+                `Author: ${this.context.user.name} (${this.context.user.email})`,
+            );
         }
         return lines;
     }
@@ -290,7 +278,7 @@ export default abstract class ServiceContext {
     /**
      * Make the ingore components to get sent to the ignore generation service.
      * @function makeIgnoreComponents
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {string[]} Ignore components.
      */
     makeIgnoreComponents(): string[] {
@@ -300,7 +288,7 @@ export default abstract class ServiceContext {
     /**
      * Create the .gitignore file.
      * @function createGitIgnore
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {void}
      */
     async createGitIgnore(): Promise<void> {
@@ -309,7 +297,7 @@ export default abstract class ServiceContext {
         await Axios.get(url)
             .then((response) => {
                 const ignoreContent = response.data;
-                fs.writeFileSync(
+                writeFileSync(
                     join(this.serviceDirectory, '.gitignore'),
                     ignoreContent,
                 );
@@ -323,7 +311,7 @@ export default abstract class ServiceContext {
     /**
      * Creates ignore files.
      * @function createIgnoreFiles
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {void}
      */
     createIgnoreFiles(): void {
@@ -333,7 +321,7 @@ export default abstract class ServiceContext {
     /**
      * Event listener for after an initialization.
      * @function postInit
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {void}
      */
     postInit(): void {
@@ -344,7 +332,7 @@ export default abstract class ServiceContext {
     /**
      * Event listener for after a version bump.
      * @function postVersionBump
-     * @memberof ServiceContext
+     * @memberof Service
      * @returns {void}
      */
     postVersionBump(): void {

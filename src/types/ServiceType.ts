@@ -1,5 +1,5 @@
 /*
- * File: ServiceContextType.ts
+ * File: ServiceType.ts
  * Created: 10/20/2020 13:26:00
  * ----
  * Copyright: 2020 Nix² Technologies
@@ -8,7 +8,7 @@
 
 import { InfoType, SchemaType } from '.';
 
-export default interface ServiceContextType {
+export default interface ServiceType {
     info: InfoType;
     type: string;
     schemas: SchemaType[];
