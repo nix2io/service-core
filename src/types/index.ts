@@ -16,4 +16,5 @@ export { default as SchemaType } from './SchemaType';
 export { default as ServiceType } from './ServiceType';
 export { default as ConfigType } from './ConfigType';
 export { default as InitializeServiceDataType } from './InitializeServiceDataType';
+export { default as MakeFileType } from './MakeFileType';
 export { Any, Obj, Primative } from './ObjectType';
