@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  [ <a href="#installation">Installation 💾</a> | <a href="#usage">Usage 🤓</a> | <a href="https://www.npmjs.com/package/@nix2/service-core">NPM 📦</a> | <a href="https://github.com/nix2io/readme-template">Github 🕸</a> ]
+  [ <a href="#installation">Installation 💾</a> | <a href="https://nix2io.github.io/service-core">API 🤓</a> | <a href="https://www.npmjs.com/package/@nix2/service-core">NPM 📦</a> | <a href="https://github.com/nix2io/readme-template">Github 🕸</a> ]
 </p>
 
 # Installation
@@ -15,4 +15,6 @@
 yarn add @nix2/service-core
 ```
 
-# Usage
+# API
+
+The Service Core API documentation is located [here](https://nix2io.github.io/service-core).
