@@ -32,8 +32,8 @@ jobs:
             - name: commit changes
               run: git -C ./service-core.wiki commit -m "Updated Docs"
               env:
-                  API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+                  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
             - name: push changes
               run: git -C ./service-core.wiki push
               env:
-                  API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+                  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
