@@ -23,8 +23,12 @@ jobs:
               run: mv ./docs/* ./service-core.wiki
             - name: remove docs folder
               run: rm -r docs
-            - name: state files
+            - name: stage files
               run: git -C ./service-core.wiki add .
+            - name: set email
+              run: git config --global user.email "cibot@nix2.io"
+            - name: set name
+              run: git config --global user.name "CI Bot"
             - name: commit changes
               run: git -C ./service-core.wiki commit -m "Updated Docs"
               env:
