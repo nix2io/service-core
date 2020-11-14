@@ -53,7 +53,7 @@ export default class ServiceCore {
                 const directoryPath = join(this.config.pluginsDirectory!, file);
                 if (lstatSync(directoryPath).isDirectory()) {
                     const pkg = require.main?.require(
-                        join(directoryPath, '/src/'),
+                        join(directoryPath, '/dist/'),
                     );
                     if (typeof pkg.getPlugin != 'function')
                         throw new InvalidPluginError(basename(directoryPath));
