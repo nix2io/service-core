@@ -15,8 +15,6 @@ jobs:
                   registry-url: https://registry.npmjs.org/
             - name: yarn install
               run: yarn install
-            - name: clone wiki
-              run: git clone https://github.com/nix2io/service-core.wiki.git
             - name: create docs
               run: yarn typedoc --plugin typedoc-plugin-markdown
 
@@ -25,7 +23,7 @@ jobs:
               env:
                   API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
               with:
-                  source_file: '.'
+                  source_file: './docs/*'
                   destination_repo: 'nix2io/service-core.wiki'
                   destination_folder: '.'
                   user_email: 'maxk@nix2io'
