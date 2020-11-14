@@ -19,23 +19,36 @@ jobs:
               run: git clone https://github.com/nix2io/service-core.wiki.git
             - name: create docs
               run: yarn typedoc --plugin typedoc-plugin-markdown
-            - name: move docs to wiki
-              run: mv ./docs/* ./service-core.wiki
-            - name: remove docs folder
-              run: rm -r docs
-            - name: stage files
-              run: git -C ./service-core.wiki add .
-            - name: set email
-              run: git config --global user.email "cibot@nix2.io"
-            - name: set name
-              run: git config --global user.name "CI Bot"
-            - name: commit changes
-              run: git -C ./service-core.wiki commit -m "Updated Docs"
+
+            - name: Moves docs to WIKI
+              uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
               env:
                   API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-            - name: push changes
-              run: git -C ./service-core.wiki push
-              env:
-                  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-            - name: remove wiki
-              run: rm -rf ./service-core.wiki
+              with:
+                  source_file: './docs/*'
+                  destination_repo: 'nix2io/service-core.wiki'
+                  destination_folder: '.'
+                  user_email: 'cibot@nix2io'
+                  user_name: 'CI Bot'
+                  commit_message: 'Update docs'
+
+            # - name: move docs to wiki
+            #   run: mv ./docs/* ./service-core.wiki
+            # - name: remove docs folder
+            #   run: rm -r docs
+            # - name: stage files
+            #   run: git -C ./service-core.wiki add .
+            # - name: set email
+            #   run: git config --global user.email "cibot@nix2.io"
+            # - name: set name
+            #   run: git config --global user.name "CI Bot"
+            # - name: commit changes
+            #   run: git -C ./service-core.wiki commit -m "Updated Docs"
+            #   env:
+            #       API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+            # - name: push changes
+            #   run: git -C ./service-core.wiki push
+            #   env:
+            #       API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+            # - name: remove wiki
+            #   run: rm -rf ./service-core.wiki
