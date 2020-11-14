@@ -23,14 +23,13 @@ jobs:
             - name: Moves docs to WIKI
               uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
               env:
-                  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+                  API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
               with:
                   source_file: './docs/*'
                   destination_repo: 'nix2io/service-core.wiki'
                   destination_folder: '.'
-                  user_email: 'cibot@nix2io'
-                  user_name: 'CI Bot'
-                  commit_message: 'Update docs'
+                  user_email: 'maxk@nix2.io'
+                  user_name: 'Max Koon'
 
             # - name: move docs to wiki
             #   run: mv ./docs/* ./service-core.wiki
