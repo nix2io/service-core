@@ -1,0 +1,33 @@
+name: Docs
+on:
+    push:
+        branches:
+            - main
+jobs:
+    ci:
+        name: Update the WIKI with documentation.
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+                  registry-url: https://registry.npmjs.org/
+            - name: yarn install
+              run: yarn install
+            - name: clone wiki
+              run: git clone https://github.com/nix2io/service-core.wiki.git
+            - name: create docs
+              run: yarn typedoc --plugin typedoc-plugin-markdown
+            - name: move docs to wiki
+              run: mv ./docs/* ./service-core.wiki
+            - name: remove docs folder
+              run: rm -r docs
+            - name: state files
+              run: git -C ./service-core.wiki add .
+            - name: commit changes
+              run: git -C ./service-core.wiki commit -m "Updated Docs"
+            - name: push changes
+              run: git -C ./service-core.wiki push
+            - name: remove wiki
+              run: rm -rf ./service-core.wiki
